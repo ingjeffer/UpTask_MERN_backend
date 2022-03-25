@@ -11,7 +11,7 @@ const checkAuth = async (req, res, next) => {
             // console.log(decode);
             req.usuario = await Usuario.findById(decode.id).select('-password -confirmado -token -createdAt -updatedAt -__v');
             // console.log(req.usuario);
-            next();
+            return next();
         } catch (error) {
             return res.status(404).json({ msg: 'Hubo un error' });
         }
