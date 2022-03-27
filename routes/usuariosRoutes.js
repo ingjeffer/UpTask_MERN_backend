@@ -7,12 +7,14 @@ import {
   comprobarToken,
   nuevoPassword,
   perfil,
+  demo
 } from "../controllers/usuarioController.js";
 import checkAuth from "../middleware/checkAuth.js";
 // import { usuarios, crearUsuario } from "../controllers/usuarioController.js";
 
 const router = express.Router();
 
+router.get('/', demo);
 // router.get('/', usuarios);
 // router.post('/', crearUsuario)
 

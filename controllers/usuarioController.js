@@ -2,6 +2,7 @@
 //     res.json({ msg: 'Desde API/USUARIOS' });
 // };
 
+import { emailRegistro, emailOlvidePassword } from "../helpers/email.js";
 import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
 import Usuario from "../models/Usuario.js";
@@ -34,7 +35,15 @@ const registrar = async (req, res) => {
     usuario.token = generarId();
     // console.log(usuario);
     const usuarioAlmacenado = await usuario.save();
-    res.json(usuarioAlmacenado);
+    // res.json(usuarioAlmacenado);
+
+    emailRegistro({
+      email: usuario.email,
+      nombre: usuario.nombre,
+      token: usuario.token,
+    });
+
+    res.json({ msg: 'Usuario Creado Correctamente, Revista tu Email para confirmar tu cuenta' });
   } catch (error) {
     console.log(error);
   }
@@ -52,10 +61,10 @@ const auntenticar = async (req, res) => {
   }
 
   // Comprobar si el usuario está confirmado
-  // if (!usuario.confirmado) {
-  //     const error = new Error('Tu cuenta no ha sido confirmada');
-  //     return res.status(404).json({ msg: error.message });
-  // }
+  if (!usuario.confirmado) {
+      const error = new Error('Tu cuenta no ha sido confirmada');
+      return res.status(404).json({ msg: error.message });
+  }
 
   // Comprobar su password
   if (await usuario.comprobarPassword(password)) {
@@ -89,6 +98,7 @@ const confirmar = async (req, res) => {
 };
 
 const olvidePassword = async (req, res) => {
+  // console.log(req.body);
   const { email } = req.body;
   const usuario = await Usuario.findOne({ email });
 
@@ -100,6 +110,14 @@ const olvidePassword = async (req, res) => {
   try {
     usuario.token = generarId();
     await usuario.save();
+
+    // console.log(usuario);
+    emailOlvidePassword({
+      email: usuario.email,
+      nombre: usuario.nombre,
+      token: usuario.token,
+    });
+
     res.json({ msg: "Hemos enviado un email con las intrucciones" });
   } catch (error) {}
 };
@@ -142,6 +160,10 @@ const perfil = async (req, res) => {
   res.json(usuario);
 };
 
+const demo = async (req, res) => {
+  res.json({ msg: 'demo response'});
+};
+
 export {
   registrar,
   auntenticar,
@@ -150,4 +172,5 @@ export {
   comprobarToken,
   nuevoPassword,
   perfil,
+  demo,
 };
